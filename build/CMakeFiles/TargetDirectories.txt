@@ -1,0 +1,7 @@
+/home/user/p/TextCommunicationGUI/build/CMakeFiles/edit_cache.dir
+/home/user/p/TextCommunicationGUI/build/CMakeFiles/rebuild_cache.dir
+/home/user/p/TextCommunicationGUI/build/_client/CMakeFiles/test_project.dir
+/home/user/p/TextCommunicationGUI/build/_client/CMakeFiles/edit_cache.dir
+/home/user/p/TextCommunicationGUI/build/_client/CMakeFiles/rebuild_cache.dir
+/home/user/p/TextCommunicationGUI/build/_client/CMakeFiles/test_project_autogen_timestamp_deps.dir
+/home/user/p/TextCommunicationGUI/build/_client/CMakeFiles/test_project_autogen.dir
