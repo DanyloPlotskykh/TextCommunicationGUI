@@ -6,18 +6,24 @@
 #include <QObject>
 #include <QDebug>
 
-class Backend : public QObject {
-    Q_OBJECT
-public slots:
-    void buttonClicked() {
-        qDebug() << "button!!!";
-    }
-};
+#include "Network.hpp"
+
+// class Backend : public QObject {
+//     Q_OBJECT
+// public slots:
+//     void buttonClicked() {
+//         qDebug() << "button!!!";
+//     }
+//     void connectctnClicked()
+//     {
+//         qDebug() << "Connecting...";
+//     }
+// };
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
-    Backend backend;
+    Network backend;
 
     QQmlApplicationEngine engine;
 

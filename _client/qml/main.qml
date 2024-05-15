@@ -12,35 +12,56 @@ ApplicationWindow {
         width: parent.width 
         height: parent.height 
         color: "lightblue"
-
-        RowLayout {
-            anchors.fill: parent 
-            TextArea {
-                width: 500
-                placeholderText: "Введите текст"
-                font.pixelSize: 16
-                
+        TextArea {
+            id: texta
+            implicitWidth: 500  // Фиксированная ширина
+            implicitHeight: 300
+            placeholderText: "Введите текст"
+            font.pixelSize: 16        
+        }
+        Rectangle
+        {
+            width: texta.width
+            anchors.top: texta.bottom
+            TextField
+            {
+                width: parent.width
+                height: parent.height
+                placeholderText: "Enter the text..."
             }
+        }
+        Rectangle
+        {
+            color: "green"
+            implicitWidth: 300 
+            implicitHeight: 400
+            anchors.left: texta.right 
             ColumnLayout {
                 spacing: 10
-
+                anchors.centerIn: parent
                 Button {
-                    text: "Кнопка 1"
-                    onClicked: {
-                        
-                    }
+                    id: connectbtn
+                    text: "Connect"
+                    // anchors.centerIn: parent
+                    onClicked: backend.onButtonClick()             
                 }
 
                 Button {
-                    text: "Кнопка 2"
-                    onClicked: {
-                        
-                    }
+                    text: "Send Message"
+                    // anchors.top: connectbtn.bottom
+                    onClicked: backend.onSubmitBtnClick()
+                }
+                Button {
+                    text: "Change port"
+                    // anchors.top: connectbtn.bottom
+                    // onClicked: backend.onSubmitBtnClick()
                 }
             }
         }
+        
     }
 }
+
 
 
 // TextArea {
