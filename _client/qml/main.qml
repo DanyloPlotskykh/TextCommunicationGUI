@@ -21,7 +21,6 @@ ApplicationWindow {
                 font.pixelSize: 16
                 
             }
-        
             ColumnLayout {
                 spacing: 10
 
