@@ -1,18 +1,18 @@
-project(test_project)
-
-find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
-find_package(Qt5 COMPONENTS Qml Quick REQUIRED)
+project(client)
 
 set_source_files_properties(main.cpp PROPERTIES SKIP_AUTOMOC ON)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Network.cpp
+)
 
-add_executable(test_project ${SRC})
+add_executable(${PROJECT_NAME} ${SRC})
 
-target_link_libraries(test_project
+target_link_libraries(${PROJECT_NAME}
     Qt5::Qml
     Qt5::Quick
     Qt5::Core 

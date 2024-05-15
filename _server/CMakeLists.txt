@@ -1,12 +1,5 @@
 project(server)
 
-# find_package(Qt6 COMPONENTS Core Widgets Network REQUIRED)
-# set(Qt_DIR /usr/lib/x86_64-linux-gnu/cmake/Qt6)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network)
-find_package(Qt5 COMPONENTS Qml Quick REQUIRED)
-
-message("QT_MAJOR_VERSION: ${QT_MAJOR_VERSION}")
-
 set_source_files_properties(main.cpp PROPERTIES SKIP_AUTOMOC ON)
 
 set(CMAKE_AUTOMOC ON)
