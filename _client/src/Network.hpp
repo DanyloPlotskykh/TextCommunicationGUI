@@ -19,4 +19,6 @@ private:
     QTcpSocket *clientSocket;
     QByteArray Data;
     void sendMessage(QString message);
+    bool parseMessage(QString message, int& intPort);
+    int port;
 };

@@ -2,11 +2,11 @@
 #include <iostream>
 #include <QDataStream>
 
-Server::Server()
+Server::Server() : port(7300)
 {
     try
     { 
-        if(this->listen(QHostAddress::Any, 7300))
+        if(this->listen(QHostAddress::Any, port))
         {
             qDebug() << "Server listening on port 7300";
         } 
@@ -24,7 +24,6 @@ Server::Server()
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
-    std::cout << "sdfsfd" << std::endl;
     socket = new QTcpSocket();
     socket->setSocketDescriptor(socketDescriptor);
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotRead);
@@ -50,7 +49,7 @@ void Server::slotRead() {
     }
 }
 
-void Server::sendToClient(QString str)
+void Server::sendToClient(const QString str)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
@@ -60,4 +59,29 @@ void Server::sendToClient(QString str)
         sockets[i]->write(Data);
     }
     socket->write(Data);    
+}
+
+bool Server::parseMessage(QString message, int& intPort)
+{
+    QString port;
+    message.remove(' ');
+    message = message.toLower();
+    for (const QChar& c : message) {
+        if (c.isDigit()) {
+            port.append(c);
+        }
+    }
+    message.remove(QRegExp("\\d"));
+
+    if (message == "newport-" && port.size() < 6) {
+        bool ok;
+        intPort = port.toInt(&ok);
+        return ok && (intPort > 1024 && intPort < 65535);
+    }
+    return false;
+}
+
+void Server::onSubmitClk(const QString message)
+{
+    qDebug() << "onSubmitClk() - " << message;
 }

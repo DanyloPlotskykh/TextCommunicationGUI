@@ -8,23 +8,42 @@ ApplicationWindow {
     height: 400
     title: "Пример приложения"
 
+    // Компонент для создания кастомного элемента динамически
+    Component {
+        id: customItemComponent
+        CustomItem {}
+    }
+    function createCustomItem(parent) {
+        var customItem = customItemComponent.createObject(parent);
+        customItem.x = Math.random() * (parent.width - customItem.width); // Устанавливаем случайное положение по X
+        customItem.y = Math.random() * (parent.height - customItem.height); // Устанавливаем случайное положение по Y
+        customItem.parent = textHistory
+    }
     Rectangle {
         width: parent.width 
         height: parent.height 
         color: "lightblue"
-        TextArea {
-            id: texta
-            implicitWidth: 500  // Фиксированная ширина
-            implicitHeight: 300
-            placeholderText: "Введите текст"
-            font.pixelSize: 16        
-        }
         Rectangle
         {
-            width: texta.width
-            anchors.top: texta.bottom
+            id: textHistory
+            implicitWidth: 500  // Фиксированная ширина
+            implicitHeight: 300
+        }
+        // TextArea {
+        //     id: texta
+        //     implicitWidth: 500  // Фиксированная ширина
+        //     implicitHeight: 300
+        //     placeholderText: "Введите текст"
+        //     font.pixelSize: 16        
+        // }
+        Rectangle
+        {
+            width: textHistory.width
+            anchors.top: textHistory.bottom
             TextField
             {
+                id: lineEdit
+                objectName: "lineEdit"
                 width: parent.width
                 height: parent.height
                 placeholderText: "Enter the text..."
@@ -35,7 +54,7 @@ ApplicationWindow {
             color: "green"
             implicitWidth: 300 
             implicitHeight: 400
-            anchors.left: texta.right 
+            anchors.left: textHistory.right 
             ColumnLayout {
                 spacing: 10
                 anchors.centerIn: parent
@@ -49,7 +68,13 @@ ApplicationWindow {
                 Button {
                     text: "Send Message"
                     // anchors.top: connectbtn.bottom
-                    onClicked: backend.onSubmitBtnClick()
+                    onClicked: { 
+                        console.log("submitBtn")
+                        createCustomItem(parent);
+                        backend.onSubmitBtnClick()
+                    }
+                    //add an implementation for create new textIsland in smth 
+                    //and get from textfield text
                 }
                 Button {
                     text: "Change port"
@@ -57,29 +82,6 @@ ApplicationWindow {
                     // onClicked: backend.onSubmitBtnClick()
                 }
             }
-        }
-        
+        } 
     }
 }
-
-
-
-// TextArea {
-//     id: inputOutputArea
-//     width: 200
-//     height: 100
-//     placeholderText: "Введите текст"
-//     font.pixelSize: 16
-//     wrapMode: Text.Wrap
-//     anchors.horizontalCenter: parent.horizontalCenter
-// }
-
-// ColumnLayout {
-//     spacing: 10 // Пространство между элементами
-//     width: 200 // Ширина макета (может быть настроена в соответствии с вашими требованиями)
-
-//     Text { text: "Элемент 1" }
-//     Rectangle { width: 100; height: 50; color: "red" } // Пример элемента
-//     Text { text: "Элемент 2" }
-//     Rectangle { width: 100; height: 50; color: "blue" } // Пример элемента
-// }

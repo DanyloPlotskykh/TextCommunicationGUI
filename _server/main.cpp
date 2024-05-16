@@ -1,10 +1,28 @@
-#include <QCoreApplication>
-#include <QDebug>
+// #include <QCoreApplication>
 #include "server.hpp"
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QObject>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
-    Server *s = new Server();   
+    QGuiApplication app(argc, argv);
+
+    Server s;
+
+    QQmlApplicationEngine engine;
+
+    engine.rootContext()->setContextProperty("backend", &s);
+
+    const QUrl url(QStringLiteral("../../_server/main.qml"));
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                     &app, [url](QObject *obj, const QUrl &objUrl) {
+        if (!obj && url == objUrl)
+            QCoreApplication::exit(-1);
+    }, Qt::QueuedConnection);
+    engine.load(url);
+
     return app.exec();
 }
