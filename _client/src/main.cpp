@@ -1,5 +1,3 @@
-// main.cpp
-
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -8,24 +6,17 @@
 
 #include "Network.hpp"
 
-// class Backend : public QObject {
-//     Q_OBJECT
-// public slots:
-//     void buttonClicked() {
-//         qDebug() << "button!!!";
-//     }
-//     void connectctnClicked()
-//     {
-//         qDebug() << "Connecting...";
-//     }
-// };
-
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
     Network backend;
 
     QQmlApplicationEngine engine;
+
+    // Регистрируем компонент CustomItem
+    // qmlRegisterType<CustomItem>("CustomItem", 1, 0, "CustomItem");
+
+    // engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     engine.rootContext()->setContextProperty("backend", &backend);
 
