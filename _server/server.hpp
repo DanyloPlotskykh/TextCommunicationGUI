@@ -10,6 +10,8 @@ class Server : public QTcpServer
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 public:
     Server();
+    void Start();
+    void Stop();
     QTcpSocket *socket;
     QString text() const;
     void setText(const QString &text);
