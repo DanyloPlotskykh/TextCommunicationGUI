@@ -2,11 +2,11 @@
 #include <iostream>
 #include <QDataStream>
 
-Server::Server() : port(7300)
+Server::Server() : m_port(7300)
 {
     try
     { 
-        if(this->listen(QHostAddress::Any, port))
+        if(this->listen(QHostAddress::Any, m_port))
         {
             qDebug() << "Server listening on port 7300";
         } 
@@ -20,6 +20,7 @@ Server::Server() : port(7300)
     {
         std::cerr << e.what() << '\n';
     }
+    nextBlockSize = 0;
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
@@ -42,10 +43,33 @@ void Server::slotRead() {
     in.setVersion(QDataStream::Qt_5_0);
     if(in.status() == QDataStream::Ok)
     {
-        qDebug() << "Ok";
-        QString str;
-        in >> str;
-        sendToClient(str);
+        // qDebug() << "Ok";
+        // QString str;
+        // in >> str;
+        // sendToClient(str);
+        // setText(str);
+        for(;;)
+        {
+            if(nextBlockSize == 0)
+            {
+                if(socket->bytesAvailable() < 2)
+                {
+                    break;
+                }
+                in >> nextBlockSize;
+            }
+            if(socket->bytesAvailable() < nextBlockSize)
+            {
+                break;
+            }
+            QString str;
+            in >> str;
+            nextBlockSize = 0;
+            qDebug() << "received - " << str;
+            sendToClient(str);
+            setText(str);
+            break;
+        }
     }
 }
 
@@ -54,11 +78,12 @@ void Server::sendToClient(const QString str)
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << str;
+    out << quint16(0) << str;
+    out.device()->seek(0);
+    out << quint16(Data.size()-sizeof(quint16));
     for(int i = 0; i < sockets.size(); i++){
         sockets[i]->write(Data);
-    }
-    socket->write(Data);    
+    }  
 }
 
 bool Server::parseMessage(QString message, int& intPort)
@@ -84,4 +109,23 @@ bool Server::parseMessage(QString message, int& intPort)
 void Server::onSubmitClk(const QString message)
 {
     qDebug() << "onSubmitClk() - " << message;
+    int newPort;
+    if(parseMessage(message, newPort)) {
+        m_port = newPort;
+    }
+    sendToClient(message);
+} 
+
+QString Server::text() const
+{
+    return m_text;
+}
+
+void Server::setText(const QString &text)
+{
+    if (m_text == text)
+        return;
+
+    m_text = text;
+    emit textChanged();
 }
