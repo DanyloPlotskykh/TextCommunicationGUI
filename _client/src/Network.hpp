@@ -24,9 +24,11 @@ public slots:
 private:
     QTcpSocket *clientSocket;
     QByteArray Data;
+    void connectToServer();
+    void disconnectFromServer();
     void sendMessage(QString message);
     bool parseMessage(QString message, int& intPort);
-    int port;
+    int m_port;
     QString m_text;
     quint16 nextBlockSize;
 };

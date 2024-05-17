@@ -4,23 +4,30 @@
 
 Server::Server() : m_port(7300)
 {
-    try
-    { 
-        if(this->listen(QHostAddress::Any, m_port))
-        {
-            qDebug() << "Server listening on port 7300";
-        } 
-        else 
-        {
-            qDebug() << "Error listening";
-        }
-       
+    Start();
+}
+
+void Server::Start()
+{
+    if (this->isListening()) {
+        qDebug() << "Server is already running!";
+        return;
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
+
+    if (!this->listen(QHostAddress::Any, m_port)) {
+        qDebug() << "Server could not start!";
+    } else {
+        qDebug() << "Server started on port" << m_port;
     }
     nextBlockSize = 0;
+}
+
+void Server::Stop()
+{
+    if (this->isListening()) {
+        this->close();
+        qDebug() << "Server stopped!";
+    }
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
@@ -36,18 +43,10 @@ void Server::incomingConnection(qintptr socketDescriptor)
 
 void Server::slotRead() {
     socket = (QTcpSocket*)sender();
-//   QByteArray data = socket->readAll();
-//   qDebug() << "Received: " << data;
-//   sendToClient();
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_5_0);
     if(in.status() == QDataStream::Ok)
     {
-        // qDebug() << "Ok";
-        // QString str;
-        // in >> str;
-        // sendToClient(str);
-        // setText(str);
         for(;;)
         {
             if(nextBlockSize == 0)
@@ -66,8 +65,15 @@ void Server::slotRead() {
             in >> str;
             nextBlockSize = 0;
             qDebug() << "received - " << str;
+            int port;
             sendToClient(str);
-            setText(str);
+            setText(str); 
+            // if(parseMessage(str, port))
+            // {
+            //     Stop();
+            //     m_port = port;
+            //     Start();
+            // }
             break;
         }
     }
@@ -83,7 +89,15 @@ void Server::sendToClient(const QString str)
     out << quint16(Data.size()-sizeof(quint16));
     for(int i = 0; i < sockets.size(); i++){
         sockets[i]->write(Data);
-    }  
+    }
+    int newPort;
+    if(parseMessage(str, newPort))
+    {
+        qDebug() << "New port: " << newPort;
+        Stop();
+        m_port = newPort;
+        Start();
+    }
 }
 
 bool Server::parseMessage(QString message, int& intPort)

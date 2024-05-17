@@ -3,16 +3,32 @@
 #include <QQuickItem>
 
 Network::Network(QObject *parent) : QObject(parent),
-                                    port(7300)
+                                    m_port(7300)
 {
     clientSocket = new QTcpSocket(this);
     connect(clientSocket, &QTcpSocket::readyRead, this, &Network::slotReadyRead);
     nextBlockSize = 0;
 }
 
+void Network::connectToServer() 
+{
+    clientSocket->abort();
+    clientSocket->connectToHost("127.0.0.1", m_port);
+    if (clientSocket->waitForConnected(3000)) {
+        qDebug() << "Connected to server on port" << m_port;
+    } else {
+        qDebug() << "Failed to connect to server";
+    }
+}
+
+void Network::disconnectFromServer()
+{
+    clientSocket->disconnectFromHost();
+}
+
 void Network::onButtonClick()
 {
-    clientSocket->connectToHost("127.0.0.1", port);
+    connectToServer();
 }
 
 void Network::onSubmitBtnClick(QString message)
@@ -51,6 +67,9 @@ void Network::slotReadyRead()
             if(parseMessage(str, port))
             {
                 qDebug() << "Port received:" << port;
+                disconnectFromServer();
+                m_port = port;
+                connectToServer();
             }
             break;
         }
