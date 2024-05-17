@@ -26,7 +26,7 @@ ApplicationWindow {
 
             model: chatModel
             delegate: Row {
-                width: parent.width
+                width: parent.width     
                 spacing: 10
 
                 Text {

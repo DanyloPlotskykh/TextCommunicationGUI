@@ -6,7 +6,7 @@ ApplicationWindow {
     visible: true
     width: 800
     height: 400
-    title: "Пример приложения"
+    title: "Client"
 
     // Компонент для создания кастомного элемента динамически
     Component {
@@ -71,7 +71,8 @@ ApplicationWindow {
                     onClicked: { 
                         console.log("submitBtn")
                         createCustomItem(parent);
-                        backend.onSubmitBtnClick()
+                        var message = lineEdit.text;
+                        backend.onSubmitBtnClick(message)
                     }
                     //add an implementation for create new textIsland in smth 
                     //and get from textfield text

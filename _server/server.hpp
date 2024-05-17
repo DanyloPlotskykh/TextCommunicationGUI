@@ -7,16 +7,24 @@
 class Server : public QTcpServer
 {
     Q_OBJECT
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 public:
     Server();
     QTcpSocket *socket;
-    
+    QString text() const;
+    void setText(const QString &text);
+
 private:
     QVector<QTcpSocket*> sockets;
     QByteArray Data;
     void sendToClient(const QString str);
     bool parseMessage(QString message, int& inPort);
-    int port;
+    int m_port;
+    QString m_text;
+    quint16 nextBlockSize;
+
+signals:
+    void textChanged();
 
 public slots:
     void onSubmitClk(const QString message);
