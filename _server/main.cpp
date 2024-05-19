@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
+    qmlRegisterType<Server>("com.example.server", 1, 0, "Server");
+
     Server s;
 
     QQmlApplicationEngine engine;

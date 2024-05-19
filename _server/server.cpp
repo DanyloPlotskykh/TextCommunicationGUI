@@ -4,7 +4,7 @@
 
 Server::Server() : m_port(7300)
 {
-    Start();
+    // Start();
 }
 
 void Server::Start()
@@ -28,6 +28,12 @@ void Server::Stop()
         this->close();
         qDebug() << "Server stopped!";
     }
+    sockets.clear();
+}
+
+void Server::startServer()
+{
+    Start();
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
@@ -67,7 +73,7 @@ void Server::slotRead() {
             qDebug() << "received - " << str;
             int port;
             sendToClient(str);
-            setText(str); 
+            // setText(str); 
             // if(parseMessage(str, port))
             // {
             //     Stop();
@@ -87,6 +93,8 @@ void Server::sendToClient(const QString str)
     out << quint16(0) << str;
     out.device()->seek(0);
     out << quint16(Data.size()-sizeof(quint16));
+    addMessage(str);
+    // addMessage("Server: " + str);
     for(int i = 0; i < sockets.size(); i++){
         sockets[i]->write(Data);
     }
@@ -141,5 +149,10 @@ void Server::setText(const QString &text)
         return;
 
     m_text = text;
-    emit textChanged();
+    // emit textChanged();
+}
+
+void Server::addMessage(const QString& message)
+{
+    emit newMessage(message);
 }

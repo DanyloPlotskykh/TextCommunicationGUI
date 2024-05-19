@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import com.example.server 1.0
 
 ApplicationWindow {
     visible: true
@@ -7,10 +8,17 @@ ApplicationWindow {
     height: 600
     title: "Server"
 
-    // Button
-    // {
-    //     id: connectbtn
-    // }
+    Server {
+        id: server
+    }
+
+    Connections {
+        target: server
+        function onNewMessage(message) {
+            chatModel.append({"message": message})
+        }
+    }
+
     ListModel {
         id: chatModel
     }
@@ -19,14 +27,25 @@ ApplicationWindow {
         anchors.fill: parent
         spacing: 10
 
+        Item {
+            width: parent.width
+            height: startButton.height
+
+            Button {
+                id: startButton
+                text: "Start Server"
+                onClicked: server.startServer()
+            }
+        }
+
         ListView {
             id: chatListView
             width: parent.width
-            height: parent.height - sendRow.height - 20 
+            height: parent.height - sendRow.height - startButton.height - 30
 
             model: chatModel
             delegate: Row {
-                width: parent.width     
+                width: parent.width
                 spacing: 10
 
                 Text {
@@ -63,9 +82,8 @@ ApplicationWindow {
                 text: "Send"
                 onClicked: {
                     var message = messageInput.text.trim()
-                    backend.onSubmitClk(message)
+                    server.onSubmitClk(message)
                     if (message !== "") {
-                        chatModel.append({ "message": message })
                         messageInput.text = ""
                     }
                 }

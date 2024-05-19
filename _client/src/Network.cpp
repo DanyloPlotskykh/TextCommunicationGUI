@@ -63,7 +63,9 @@ void Network::slotReadyRead()
             in >> str;
             nextBlockSize = 0;
             qDebug() << "received - " << str;
+            // setText(str);
             int port;
+            addMessage(str);
             if(parseMessage(str, port))
             {
                 qDebug() << "Port received:" << port;
@@ -112,6 +114,12 @@ bool Network::parseMessage(QString message, int& intPort)
     return false;
 }
 
+void Network::addMessage(const QString &message)
+{
+    qDebug() << "Emitting newMessage signal with message:" << message;
+    emit newMessage(message);
+}
+
 QString Network::text() const
 {
     return m_text;
@@ -119,9 +127,9 @@ QString Network::text() const
 
 void Network::setText(const QString &text)
 {
-    if (m_text == text)
-        return;
-
-    m_text = text;
-    emit textChanged();
+    QQuickItem *rootItem = qobject_cast<QQuickItem*>(m_engine->rootObjects().first());
+    if (rootItem) {
+        QMetaObject::invokeMethod(rootItem, "addMessageFromCpp",
+                                  Q_ARG(QVariant, QVariant::fromValue(text)));
+    }
 }
