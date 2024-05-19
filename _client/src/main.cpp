@@ -1,6 +1,6 @@
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQmlApplicationEngine>
 #include <QObject>
 #include <QDebug>
 
@@ -9,18 +9,14 @@
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
+    QQmlApplicationEngine engine;
     Network backend;
 
-    QQmlApplicationEngine engine;
-
-    // Регистрируем компонент CustomItem
-    // qmlRegisterType<CustomItem>("CustomItem", 1, 0, "CustomItem");
-
-    // engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    qmlRegisterType<Network>("com.example.networki", 1, 0, "Network");
 
     engine.rootContext()->setContextProperty("backend", &backend);
 
-    const QUrl url(QStringLiteral("../../_client/qml/main.qml"));
+    const QUrl url(QStringLiteral("../../_client/src/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
@@ -28,7 +24,8 @@ int main(int argc, char *argv[]) {
     }, Qt::QueuedConnection);
     engine.load(url);
 
+    if (engine.rootObjects().isEmpty())
+        return -1;
+
     return app.exec();
 }
-
-// #include "main.moc"

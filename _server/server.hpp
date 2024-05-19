@@ -7,7 +7,7 @@
 class Server : public QTcpServer
 {
     Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    // Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 public:
     Server();
     void Start();
@@ -26,10 +26,14 @@ private:
     quint16 nextBlockSize;
 
 signals:
+    void newMessage(const QString& message);
     void textChanged();
 
 public slots:
     void onSubmitClk(const QString message);
     void incomingConnection(qintptr socketDescriptor);
     void slotRead();
+    void startServer();
+    void addMessage(const QString &message);
+    
 };

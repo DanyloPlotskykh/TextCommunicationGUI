@@ -1,6 +1,7 @@
 #pragma once
 #include <QTcpSocket>
 #include <QByteArray>
+#include <QQmlApplicationEngine>
 #include <QObject>
 
 class Network : public QObject
@@ -8,18 +9,20 @@ class Network : public QObject
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 public:
-    Network(QObject *parent = nullptr);
+    explicit Network(QObject *parent = nullptr);
     QString text() const;
-    void setText(const QString &text);
+    
 
 signals:
     void textChanged();
+    void newMessage(const QString& message);
 
 public slots:
     void onButtonClick();
     void onSubmitBtnClick(QString message);
-
+    void setText(const QString &text);
     void slotReadyRead();
+    void addMessage(const QString &message);
 
 private:
     QTcpSocket *clientSocket;
@@ -31,4 +34,5 @@ private:
     int m_port;
     QString m_text;
     quint16 nextBlockSize;
+    QQmlApplicationEngine *m_engine;
 };
