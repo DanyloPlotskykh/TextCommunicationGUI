@@ -17,7 +17,6 @@ ApplicationWindow {
     Connections {
         target: backend
         function onNewMessage(message) {
-            console.log("Received new message in QML: " + message); 
             messageModel.append({"message": message});
         }
     }
@@ -35,7 +34,6 @@ ApplicationWindow {
                 text: qsTr("Подключиться")
                 Layout.fillWidth: true
                 onClicked: {
-                    console.log("Button Clicked"); // Отладка
                     backend.onButtonClick()
                 }
             }
@@ -43,7 +41,7 @@ ApplicationWindow {
                 text: qsTr("Change Port")
                 Layout.fillWidth: true
                 onClicked: {
-                    // Your implementation here
+                    dialog.open()
                 }
             }
         }
@@ -66,7 +64,7 @@ ApplicationWindow {
                         Layout.fillWidth: true
                     }
                     Button {
-                        text: qsTr("Удалить")
+                        text: qsTr("Delete")
                         onClicked: {
                             messageModel.remove(index)
                         }
@@ -82,15 +80,14 @@ ApplicationWindow {
             TextField {
                 id: messageInput
                 Layout.fillWidth: true
-                placeholderText: qsTr("Введите сообщение")
+                placeholderText: qsTr("Enter message here...")
             }
 
             Button {
-                text: qsTr("Отправить")
+                text: qsTr("Send")
                 onClicked: {
                     if (messageInput.text !== "") {
                         backend.onSubmitBtnClick(messageInput.text)
-                        messageModel.append({"message": messageInput.text})
                         messageInput.text = ""
                     }
                 }
@@ -98,11 +95,59 @@ ApplicationWindow {
         }
     }
 
-    ListModel {
-        id: messageModel
+    Dialog {
+        id: dialog
+        title: "Change Port"
+        visible: false
+
+        contentItem: Column {
+            spacing: 10
+            width: parent.width
+            padding: 20
+
+            Text {
+                text: "This is a dialog message."
+                wrapMode: Text.WordWrap
+            }
+
+            TextField {
+                id: portfield
+                Layout.fillWidth: true
+                placeholderText: qsTr("Enter port here...")
+            }
+            RowLayout
+            {
+                id: dialogRow
+                Layout.fillWidth: true
+                spacing: 10
+
+                Button {
+                    text: qsTr("Change")
+                    Layout.fillWidth: true
+                    onClicked: {
+                        // backend.onButtonClick()
+                        var message = portfield.text;
+                        backend.onChangePortClick(message)
+                        portfield.text = ""
+                        dialog.close()
+                    }
+                }
+                Button {
+                    text: qsTr("Cancel")
+                    Layout.fillWidth: true
+                    onClicked: {
+                        dialog.close()
+                    }
+                }
+            }
+        }
     }
 
-    Component.onCompleted: {
-        messageModel.append({"message": "Test message"});
+    Dialog {
+        id: correctDialog        
+    }
+
+    ListModel {
+        id: messageModel
     }
 }

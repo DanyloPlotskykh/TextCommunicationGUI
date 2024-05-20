@@ -1,4 +1,6 @@
 #include "Network.hpp"
+
+#include <QRegularExpression>
 #include <QDataStream>
 #include <QQuickItem>
 
@@ -33,8 +35,6 @@ void Network::onButtonClick()
 
 void Network::onSubmitBtnClick(QString message)
 {
-    QString str = "Hello from client!!!";
-    //QQuickItem *lineEdit = qobject_cast<QQuickItem*>(engine.rootObjects()[0]->findChild<QObject*>("lineEditObjectName"));
     sendMessage(message);
 }
 
@@ -44,7 +44,6 @@ void Network::slotReadyRead()
     QDataStream in(clientSocket);
     in.setVersion(QDataStream::Qt_5_0);
     if(in.status() == QDataStream::Ok){
-        // textBrowser->append(str);
         for(;;)
         {
             if(nextBlockSize == 0)
@@ -63,7 +62,6 @@ void Network::slotReadyRead()
             in >> str;
             nextBlockSize = 0;
             qDebug() << "received - " << str;
-            // setText(str);
             int port;
             addMessage(str);
             if(parseMessage(str, port))
@@ -78,10 +76,8 @@ void Network::slotReadyRead()
     }
     else 
     {
-        // textBrowser->append(QString("Error reading data from socket"));
+        addMessage(QString("Error reading data from socket"));
     }
-    // Data = clientSocket->readAll();
-    // textBrowser->append(Data);
 }
 
 void Network::sendMessage(QString message) {
@@ -120,16 +116,21 @@ void Network::addMessage(const QString &message)
     emit newMessage(message);
 }
 
-QString Network::text() const
-{
-    return m_text;
+bool isAllDigits(const QString &str) {
+    QRegularExpression re("^\\d+$");
+    return re.match(str).hasMatch();
 }
 
-void Network::setText(const QString &text)
+void Network::onChangePortClick(const QString& message)
 {
-    QQuickItem *rootItem = qobject_cast<QQuickItem*>(m_engine->rootObjects().first());
-    if (rootItem) {
-        QMetaObject::invokeMethod(rootItem, "addMessageFromCpp",
-                                  Q_ARG(QVariant, QVariant::fromValue(text)));
+    qDebug() << "log message: " << message;
+    if(isAllDigits(message))
+    {   
+        int intPort = message.toInt();
+        (intPort > 1024 && intPort < 65535) ? sendMessage(QString("newport-") + QString::number(intPort)) : emit incorrectPort();
+    }
+    else
+    {
+        emit incorrectPort();
     }
 }
