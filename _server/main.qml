@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import com.example.server 1.0
 
 ApplicationWindow {
@@ -23,28 +24,38 @@ ApplicationWindow {
         id: chatModel
     }
 
-    Column {
+    ColumnLayout {
         anchors.fill: parent
-        spacing: 10
 
-        Item {
+        RowLayout {
             width: parent.width
             height: startButton.height
+            spacing: 10
 
             Button {
                 id: startButton
                 text: "Start Server"
                 onClicked: server.startServer()
+                Layout.fillWidth: true
+            }
+
+            Button {
+                id: changePortButton
+                text: "Change Port"
+                onClicked: {
+
+                }
+                Layout.fillWidth: true
             }
         }
 
         ListView {
             id: chatListView
-            width: parent.width
-            height: parent.height - sendRow.height - startButton.height - 30
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
             model: chatModel
-            delegate: Row {
+            delegate: RowLayout {
                 width: parent.width
                 spacing: 10
 
@@ -65,25 +76,23 @@ ApplicationWindow {
             }
         }
 
-        Row {
-            id: sendRow
+        RowLayout {
+            id: buttonsRow
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignBottom
             spacing: 10
-            width: parent.width
 
-            TextArea {
+            TextField {
                 id: messageInput
-                width: parent.width - sendButton.width - 20
-                height: 50
-                placeholderText: "Enter the text..."
+                Layout.fillWidth: true
+                placeholderText: qsTr("Enter message here...")
             }
 
             Button {
-                id: sendButton
-                text: "Send"
+                text: qsTr("Send")
                 onClicked: {
-                    var message = messageInput.text.trim()
-                    server.onSubmitClk(message)
-                    if (message !== "") {
+                    if (messageInput.text !== "") {
+                        server.onSubmitClk(messageInput.text)
                         messageInput.text = ""
                     }
                 }

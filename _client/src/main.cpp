@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 
     engine.rootContext()->setContextProperty("backend", &backend);
 
-    const QUrl url(QStringLiteral("../../_client/src/main.qml"));
+    const QUrl url(QStringLiteral("../../_client/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
