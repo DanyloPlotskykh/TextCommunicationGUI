@@ -1,14 +1,48 @@
 #include "server.hpp"
 #include <QDataStream>
 #include <QRegularExpression>
+#include <chrono>
+#include <random>
 
-Server::Server() : m_port(7300)
+Server::Server() : m_port(7300),
+                   stop_timer(false)
 {
+    connect(this, &Server::onTimer, this, &Server::timerSlot);
 }
 
 Server::~Server()
 {
     sockets.clear();
+}
+
+void Server::timerSlot(const int port)
+{ 
+    qDebug() << "Timer slot!";
+    sendToClient("newport-" + QString::number(port));
+}
+
+int generate_random_port() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dis(1024, 65535);
+    return dis(gen);
+}
+
+void Server::timer()
+{
+    std::unique_lock<std::mutex> lk(cv_m);
+    while (true) {
+        if (cv.wait_for(lk, std::chrono::seconds(45), [this]{ return stop_timer.load(); })) {
+            qDebug() << "Timer stopped!";
+            break;
+        } else {
+            int port = generate_random_port();
+            qDebug() << "Время истекло, выполняем действие!";
+            emit onTimer(port);
+            break;
+        }
+    }
+    qDebug() << "(after while) Timer thread stopped!";
 }
 
 void Server::Start()
@@ -22,6 +56,7 @@ void Server::Start()
         qDebug() << "Server could not start!";
     } else {
         qDebug() << "Server started on port" << m_port;
+        m_timerThread = std::thread(&Server::timer, this);
     }
     nextBlockSize = 0;
 }
@@ -32,6 +67,10 @@ void Server::Stop()
         this->close();
         qDebug() << "Server stopped!";
     }
+    stop_timer = true;
+    cv.notify_one();
+    m_timerThread.join();
+    stop_timer.store(false);
     sockets.clear();
 }
 
@@ -127,7 +166,6 @@ bool Server::parseMessage(QString message, int& intPort)
 void Server::onSubmitClk(const QString message)
 {
     qDebug() << "onSubmitClk() - " << message;
-    int newPort;
     sendToClient(message);
 } 
 

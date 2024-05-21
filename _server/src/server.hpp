@@ -3,6 +3,10 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QVector>
+#include <condition_variable>
+#include <mutex>
+#include <atomic>
+#include <thread>
 
 class Server : public QTcpServer
 {
@@ -17,16 +21,26 @@ public:
 private:
     QVector<QTcpSocket*> sockets;
     QByteArray Data;
-    void sendToClient(const QString str);
-    bool parseMessage(QString message, int& inPort);
     int m_port;
     quint16 nextBlockSize;
+    //for timer
+    std::thread m_timerThread;
+    std::atomic<bool> stop_timer;
+    std::condition_variable cv;
+    std::mutex cv_m;
+    
+
+private:
+    void sendToClient(const QString str);
+    bool parseMessage(QString message, int& inPort);
+    void timer();
 
 signals:
     void newMessage(const QString& message);
     void incorrectPort();
     void connectionStatusChanged();
     void conncetToServerFailed();
+    void onTimer(const int port);
 
 public slots:
     void onSubmitClk(const QString message);
@@ -35,4 +49,5 @@ public slots:
     void startServer();
     void addMessage(const QString &message);
     void onChangePortClick(const QString& message);
+    void timerSlot(const int port);
 };

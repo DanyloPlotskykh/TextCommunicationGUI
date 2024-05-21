@@ -66,13 +66,6 @@ ApplicationWindow {
                         text: model.message
                         wrapMode: Text.Wrap
                         Layout.fillWidth: true
-                        onEditingFinished: 
-                        {
-                            if (messageInput.text !== "") {
-                                server.onSubmitClk(messageInput.text)
-                                messageInput.text = ""
-                            }
-                        }
                     }
                     Button {
                         text: qsTr("Delete")
@@ -92,6 +85,13 @@ ApplicationWindow {
                 id: messageInput
                 Layout.fillWidth: true
                 placeholderText: qsTr("Enter message here...")
+                onEditingFinished: 
+                {
+                    if (messageInput.text !== "") {
+                        server.onSubmitClk(messageInput.text)
+                        messageInput.text = ""
+                    }
+                }
             }
 
             Button {
