@@ -7,14 +7,12 @@
 class Server : public QTcpServer
 {
     Q_OBJECT
-    // Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 public:
     Server();
+    ~Server();
     void Start();
     void Stop();
     QTcpSocket *socket;
-    QString text() const;
-    void setText(const QString &text);
 
 private:
     QVector<QTcpSocket*> sockets;
@@ -22,12 +20,13 @@ private:
     void sendToClient(const QString str);
     bool parseMessage(QString message, int& inPort);
     int m_port;
-    QString m_text;
     quint16 nextBlockSize;
 
 signals:
     void newMessage(const QString& message);
-    void textChanged();
+    void incorrectPort();
+    void connectionStatusChanged();
+    void conncetToServerFailed();
 
 public slots:
     void onSubmitClk(const QString message);
@@ -35,5 +34,5 @@ public slots:
     void slotRead();
     void startServer();
     void addMessage(const QString &message);
-    
+    void onChangePortClick(const QString& message);
 };

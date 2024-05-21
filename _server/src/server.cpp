@@ -1,10 +1,14 @@
 #include "server.hpp"
-#include <iostream>
 #include <QDataStream>
+#include <QRegularExpression>
 
 Server::Server() : m_port(7300)
 {
-    // Start();
+}
+
+Server::~Server()
+{
+    sockets.clear();
 }
 
 void Server::Start()
@@ -73,13 +77,6 @@ void Server::slotRead() {
             qDebug() << "received - " << str;
             int port;
             sendToClient(str);
-            // setText(str); 
-            // if(parseMessage(str, port))
-            // {
-            //     Stop();
-            //     m_port = port;
-            //     Start();
-            // }
             break;
         }
     }
@@ -94,7 +91,6 @@ void Server::sendToClient(const QString str)
     out.device()->seek(0);
     out << quint16(Data.size()-sizeof(quint16));
     addMessage(str);
-    // addMessage("Server: " + str);
     for(int i = 0; i < sockets.size(); i++){
         sockets[i]->write(Data);
     }
@@ -132,27 +128,37 @@ void Server::onSubmitClk(const QString message)
 {
     qDebug() << "onSubmitClk() - " << message;
     int newPort;
-    if(parseMessage(message, newPort)) {
-        m_port = newPort;
-    }
     sendToClient(message);
 } 
-
-QString Server::text() const
-{
-    return m_text;
-}
-
-void Server::setText(const QString &text)
-{
-    if (m_text == text)
-        return;
-
-    m_text = text;
-    // emit textChanged();
-}
 
 void Server::addMessage(const QString& message)
 {
     emit newMessage(message);
+}
+
+bool isAllDigits(const QString &str) {
+    QRegularExpression re("^\\d+$");
+    return re.match(str).hasMatch();
+}
+
+void Server::onChangePortClick(const QString& message)
+{
+    qDebug() << "log message: " << message;
+    if(isAllDigits(message))
+    {   
+        int intPort = message.toInt();
+        if(intPort > 1024 && intPort < 65535)
+        {
+            sendToClient(QString("newport-") + QString::number(intPort));
+            emit connectionStatusChanged();
+        }
+        else
+        {
+            emit incorrectPort();
+        }
+    }
+    else
+    {
+        emit incorrectPort();
+    }
 }

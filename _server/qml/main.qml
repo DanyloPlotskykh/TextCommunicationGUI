@@ -18,6 +18,12 @@ ApplicationWindow {
         function onNewMessage(message) {
             chatModel.append({"message": message})
         }
+        function onConnectionStatusChanged() {
+            correctDialog.open()
+        }
+        function onIncorrectPort() {
+            inCorrectDialog.open()
+        }
     }
 
     ListModel {
@@ -43,7 +49,7 @@ ApplicationWindow {
                 id: changePortButton
                 text: "Change Port"
                 onClicked: {
-
+                    changePortDialog.open();
                 }
                 Layout.fillWidth: true
             }
@@ -86,6 +92,13 @@ ApplicationWindow {
                 id: messageInput
                 Layout.fillWidth: true
                 placeholderText: qsTr("Enter message here...")
+                onEditingFinished: 
+                {
+                    if (messageInput.text !== "") {
+                        server.onSubmitClk(messageInput.text)
+                        messageInput.text = ""
+                    }
+                }
             }
 
             Button {
@@ -98,5 +111,17 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+    ChangePortDialog {
+        id: changePortDialog
+    } 
+
+    CorrectDialog {
+        id: correctDialog
+    }
+
+    IncorrectDialog {
+        id: inCorrectDialog
     }
 }
