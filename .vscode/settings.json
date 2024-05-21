@@ -8,6 +8,8 @@
         "type_traits": "cpp",
         "xstring": "cpp",
         "system_error": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "mutex": "cpp",
+        "atomic": "cpp"
     }
 }
