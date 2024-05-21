@@ -15,15 +15,19 @@ public:
 signals:
     void newMessage(const QString& message);
     void incorrectPort();
+    void connectionStatusChanged();
+    void conncetToServerFailed();
 
 public slots:
     void onButtonClick();
     void onSubmitBtnClick(QString message);
     void slotReadyRead();
-    void addMessage(const QString &message);
+    
     void onChangePortClick(const QString& message);
+    
 
 private:
+    void addMessage(const QString &message);
     QTcpSocket *clientSocket;
     QByteArray Data;
     void connectToServer();

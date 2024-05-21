@@ -19,6 +19,7 @@ void Network::connectToServer()
     if (clientSocket->waitForConnected(3000)) {
         qDebug() << "Connected to server on port" << m_port;
     } else {
+        emit conncetToServerFailed();
         qDebug() << "Failed to connect to server";
     }
 }
@@ -127,7 +128,15 @@ void Network::onChangePortClick(const QString& message)
     if(isAllDigits(message))
     {   
         int intPort = message.toInt();
-        (intPort > 1024 && intPort < 65535) ? sendMessage(QString("newport-") + QString::number(intPort)) : emit incorrectPort();
+        if(intPort > 1024 && intPort < 65535)
+        {
+            sendMessage(QString("newport-") + QString::number(intPort));
+            emit connectionStatusChanged();
+        }
+        else
+        {
+            emit incorrectPort();
+        }
     }
     else
     {
