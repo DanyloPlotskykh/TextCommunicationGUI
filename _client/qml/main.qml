@@ -19,6 +19,18 @@ ApplicationWindow {
         function onNewMessage(message) {
             messageModel.append({"message": message});
         }
+        function onConnectionStatusChanged() 
+        {
+            correctDialog.open()
+        }
+        function onIncorrectPort() 
+        {
+            inCorrectDialog.open()
+        }
+        function onConncetToServerFailed()
+        {
+            failedConnectToServerDialog.open()
+        }
     }
 
     ColumnLayout {
@@ -31,7 +43,7 @@ ApplicationWindow {
             spacing: 10
 
             Button {
-                text: qsTr("Подключиться")
+                text: qsTr("Connect")
                 Layout.fillWidth: true
                 onClicked: {
                     backend.onButtonClick()
@@ -99,6 +111,12 @@ ApplicationWindow {
         id: dialog
         title: "Change Port"
         visible: false
+        modal: true
+
+        Component.onCompleted: {
+            dialog.x = (parent.width - dialog.width) / 2;
+            dialog.y = (parent.height - dialog.height) / 2;
+        }
 
         contentItem: Column {
             spacing: 10
@@ -106,7 +124,7 @@ ApplicationWindow {
             padding: 20
 
             Text {
-                text: "This is a dialog message."
+                text: "Enter the port number"
                 wrapMode: Text.WordWrap
             }
 
@@ -137,6 +155,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     onClicked: {
                         dialog.close()
+                        // correctDialog.open()
                     }
                 }
             }
@@ -144,7 +163,69 @@ ApplicationWindow {
     }
 
     Dialog {
-        id: correctDialog        
+        id: correctDialog  
+        title: ""
+        visible: false
+        modal: true
+
+        standardButtons: Dialog.Ok
+
+        Component.onCompleted: {
+            correctDialog.x = (parent.width - correctDialog.width) / 2;
+            correctDialog.y = (parent.height - correctDialog.height) / 2;
+        }      
+
+        contentItem: Column {
+            Label
+            {
+                id: labeldialog
+                text: "Change port successfully!"
+            }
+        }
+    }
+
+    Dialog {
+        id: inCorrectDialog  
+        title: ""
+        visible: false
+        modal: true
+
+        standardButtons: Dialog.Ok
+
+        Component.onCompleted: {
+            inCorrectDialog.x = (parent.width - inCorrectDialog.width) / 2;
+            inCorrectDialog.y = (parent.height - inCorrectDialog.height) / 2;
+        }      
+
+        contentItem: Column {
+            Label
+            {
+                id: inclabeldialog
+                text: "Change port failed!"
+            }
+        }
+    }
+
+    Dialog {
+        id: failedConnectToServerDialog  
+        title: ""
+        visible: false
+        modal: true
+
+        standardButtons: Dialog.Ok
+
+        Component.onCompleted: {
+            failedConnectToServerDialog.x = (parent.width - failedConnectToServerDialog.width) / 2;
+            failedConnectToServerDialog.y = (parent.height - failedConnectToServerDialog.height) / 2;
+        }      
+
+        contentItem: Column {
+            Label
+            {
+                id: failedServerlabeldialog
+                text: "Connect to server failed!"
+            }
+        }
     }
 
     ListModel {
