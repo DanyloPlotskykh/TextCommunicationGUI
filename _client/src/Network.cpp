@@ -3,6 +3,12 @@
 #include <QRegularExpression>
 #include <QDataStream>
 #include <QQuickItem>
+#include <QPair>
+
+template <typename T1, typename T2>
+QPair<T1, T2> make_pair(const T1& first, const T2& second) {
+    return QPair<T1, T2>(first, second);
+}
 
 Network::Network(QObject *parent) : QObject(parent),
                                     m_port(7300)
@@ -63,13 +69,14 @@ void Network::slotReadyRead()
             in >> str;
             nextBlockSize = 0;
             qDebug() << "received - " << str;
-            int port;
+            // int port;
             addMessage(str);
-            if(parseMessage(str, port))
+            auto pair = parser(str);
+            if(pair.first == "newport-" && pair.second > 1024 && pair.second < 65535)
             {
-                qDebug() << "Port received:" << port;
+                qDebug() << "Port received:" << pair.second;
                 disconnectFromServer();
-                m_port = port;
+                m_port = pair.second;
                 connectToServer();
             }
             break;
@@ -91,24 +98,18 @@ void Network::sendMessage(QString message) {
     clientSocket->write(Data);    
 }
 
-bool Network::parseMessage(QString message, int& intPort)
+QPair<QString, int> Network::parser(QString message)
 {
-    QString port;
+    QString strNumber;
     message.remove(' ');
     message = message.toLower();
     for (const QChar& c : message) {
         if (c.isDigit()) {
-            port.append(c);
+            strNumber.append(c);
         }
     }
     message.remove(QRegExp("\\d"));
-
-    if (message == "newport-" && port.size() < 6) {
-        bool ok;
-        intPort = port.toInt(&ok);
-        return ok && (intPort > 1024 && intPort < 65535);
-    }
-    return false;
+    return make_pair(message, strNumber.toInt());
 }
 
 void Network::addMessage(const QString &message)
