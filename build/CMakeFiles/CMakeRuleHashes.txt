@@ -1,3 +1,5 @@
 # Hashes of file build rules.
-cc5bc294359b57c258b3a23616eb6d84 _client/CMakeFiles/test_project_autogen
-7fd42c823aab431b3789254d5872234c _client/test_project_autogen/timestamp
+cc5bc294359b57c258b3a23616eb6d84 _client/CMakeFiles/client_autogen
+abd49172508f097e89d41a46ed5572a0 _client/client_autogen/timestamp
+1af59a256cd48cc54d7b2c925826ccda _server/CMakeFiles/server_autogen
+c209af3eec7b1e9a960f7bd215c7fe78 _server/server_autogen/timestamp

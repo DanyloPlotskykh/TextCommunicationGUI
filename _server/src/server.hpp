@@ -32,8 +32,8 @@ private:
 
 private:
     void sendToClient(const QString str);
-    bool parseMessage(QString message, int& inPort);
     void timer();
+    QPair<QString, int> parser(QString message);
 
 signals:
     void newMessage(const QString& message);

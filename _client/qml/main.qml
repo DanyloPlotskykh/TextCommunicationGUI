@@ -88,7 +88,7 @@ ApplicationWindow {
                 onEditingFinished: 
                 {
                     if (messageInput.text !== "") {
-                        server.onSubmitClk(messageInput.text)
+                        backend.onSubmitBtnClick(messageInput.text)
                         messageInput.text = ""
                     }
                 }

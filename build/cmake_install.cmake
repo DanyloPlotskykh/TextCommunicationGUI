@@ -45,6 +45,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/user/p/TextCommunicationGUI/build/_client/cmake_install.cmake")
+  include("/home/user/p/TextCommunicationGUI/build/_server/cmake_install.cmake")
 
 endif()
 
