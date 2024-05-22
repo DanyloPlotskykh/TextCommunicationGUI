@@ -26,7 +26,6 @@ Server::~Server()
 
 void Server::timerSlot(const int port)
 { 
-    qDebug() << "Timer slot!";
     sendToClient("newport-" + QString::number(port));
 }
 
@@ -46,12 +45,10 @@ void Server::timer()
             break;
         } else {
             int port = generate_random_port();
-            qDebug() << "Время истекло, выполняем действие!";
             emit onTimer(port);
             break;
         }
     }
-    qDebug() << "(after while) Timer thread stopped!";
 }
 
 void Server::Start()
@@ -157,7 +154,10 @@ void Server::sendToClient(const QString str)
     }
     else
     {
-        m_listMessages.append(str);
+        if(sockets.size() > 0)
+        {
+            m_listMessages.append(str);
+        }
         addMessage(str);
     }
     
