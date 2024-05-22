@@ -3,12 +3,19 @@
 #include <QRegularExpression>
 #include <chrono>
 #include <random>
+#include <QPair>
+
+template <typename T1, typename T2>
+QPair<T1, T2> make_pair(const T1& first, const T2& second) {
+    return QPair<T1, T2>(first, second);
+}
 
 Server::Server() : m_port(7300),
                    stop_timer(false)
 {
     connect(this, &Server::onTimer, this, &Server::timerSlot);
-}
+    connect(this, &Server::deleteMessage, this, &Server::onDeleteBtnClick);
+}   
 
 Server::~Server()
 {
@@ -114,7 +121,6 @@ void Server::slotRead() {
             in >> str;
             nextBlockSize = 0;
             qDebug() << "received - " << str;
-            int port;
             sendToClient(str);
             break;
         }
@@ -130,9 +136,14 @@ void Server::sendToClient(const QString str)
     out.device()->seek(0);
     out << quint16(Data.size()-sizeof(quint16));
     addMessage(str);
+    m_listMessages.append(str);
     for(int i = 0; i < sockets.size(); i++){
         sockets[i]->write(Data);
     }
+    // auto pair = parser(str);
+    // if (pair.first == "newport-" && pair.second < 6 && pair.second > 1024 && pair.second < 65535)) {
+        
+    // }
     int newPort;
     if(parseMessage(str, newPort))
     {
@@ -141,6 +152,20 @@ void Server::sendToClient(const QString str)
         m_port = newPort;
         Start();
     }
+}
+
+QPair<QString, int> Server::parser(QString message)
+{
+    QString port;
+    message.remove(' ');
+    message = message.toLower();
+    for (const QChar& c : message) {
+        if (c.isDigit()) {
+            port.append(c);
+        }
+    }
+    message.remove(QRegExp("\\d"));
+    return make_pair(message, port.toInt());
 }
 
 bool Server::parseMessage(QString message, int& intPort)
@@ -161,6 +186,25 @@ bool Server::parseMessage(QString message, int& intPort)
         return ok && (intPort > 1024 && intPort < 65535);
     }
     return false;
+}
+
+bool Server::parseDeleteMessage(QString message, int& index)
+{
+    QString port;
+    message.remove(' ');
+    message = message.toLower();
+    for (const QChar& c : message) {
+        if (c.isDigit()) {
+            port.append(c);
+        }
+    }
+    message.remove(QRegExp("\\d"));
+    if(message == "//delete-")
+    {
+        qDebug() << "Delete message received!";
+        // emit deleteMessage(intPort);
+        return true;
+    }
 }
 
 void Server::onSubmitClk(const QString message)
@@ -199,4 +243,18 @@ void Server::onChangePortClick(const QString& message)
     {
         emit incorrectPort();
     }
+}
+
+void Server::onDeleteBtnClick(const int& index)
+{
+    qDebug() << "Delete button clicked!";
+    qDebug() << "index: " << index;
+    qDebug() << "size: " << m_listMessages.size();
+    if(index >= 0 && index < m_listMessages.size())
+    {
+        m_listMessages.removeAt(index);
+    }
+    sendToClient(QString("//delete-")+QString::number(index));
+    qDebug() << "size: " << m_listMessages.size();
+    emit deleteQmlMessage(index);
 }

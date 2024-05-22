@@ -24,6 +24,9 @@ ApplicationWindow {
         function onIncorrectPort() {
             inCorrectDialog.open()
         }
+        function onDeleteQmlMessage(index){
+            chatModel.remove(index)
+        }
     }
 
     ListModel {
@@ -81,7 +84,7 @@ ApplicationWindow {
                 Button {
                     text: "Delete"
                     onClicked: {
-                        chatModel.remove(index)
+                        server.onDeleteBtnClick(index)
                     }
                 }
             }
