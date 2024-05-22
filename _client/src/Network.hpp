@@ -3,6 +3,7 @@
 #include <QByteArray>
 #include <QQmlApplicationEngine>
 #include <QObject>
+#include <QList>
 
 class Network : public QObject
 {
@@ -15,18 +16,21 @@ signals:
     void incorrectPort();
     void connectionStatusChanged();
     void conncetToServerFailed();
+    void deleteQmlMessage(const int id);
 
 public slots:
     void onButtonClick();
     void onSubmitBtnClick(QString message);
     void slotReadyRead();
     void onChangePortClick(const QString& message);
+    void onDeleteBtnClick(const int id);
 
 private:
     QTcpSocket *clientSocket;
     QByteArray Data;
     int m_port;
     quint16 nextBlockSize;
+    QList<QString> m_listMessages;
 
 private:
     void connectToServer();
@@ -34,4 +38,6 @@ private:
     void sendMessage(QString message);
     QPair<QString, int> parser(QString message);
     void addMessage(const QString &message);
+    void deleteMessage(const int id);
+
 };

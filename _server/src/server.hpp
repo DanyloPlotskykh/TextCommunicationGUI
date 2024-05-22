@@ -7,6 +7,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
+#include <QList>
 
 class Server : public QTcpServer
 {
@@ -23,6 +24,8 @@ private:
     QByteArray Data;
     int m_port;
     quint16 nextBlockSize;
+    QList<QString> m_listMessages;
+
     //for timer
     std::thread m_timerThread;
     std::atomic<bool> stop_timer;
@@ -33,6 +36,7 @@ private:
 private:
     void sendToClient(const QString str);
     void timer();
+    void deleteMessage(const int id);
     QPair<QString, int> parser(QString message);
 
 signals:
@@ -40,7 +44,8 @@ signals:
     void incorrectPort();
     void connectionStatusChanged();
     void conncetToServerFailed();
-    void onTimer(const int port);
+    void onTimer(const int port); 
+    void deleteQmlMessage(const int id);
 
 public slots:
     void onSubmitClk(const QString message);
@@ -50,4 +55,5 @@ public slots:
     void addMessage(const QString &message);
     void onChangePortClick(const QString& message);
     void timerSlot(const int port);
+    void onDeleteBtnClick(const int id); 
 };

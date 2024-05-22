@@ -23,6 +23,9 @@ ApplicationWindow {
         function onConncetToServerFailed() {
             failedConnectToServerDialog.open()
         }
+        function onDeleteQmlMessage(id) {
+            messageModel.remove(id)
+        }
     }
 
     ColumnLayout {
@@ -70,7 +73,7 @@ ApplicationWindow {
                     Button {
                         text: qsTr("Delete")
                         onClicked: {
-                            messageModel.remove(index)
+                            backend.onDeleteBtnClick(index)
                         }
                     }
                 }
