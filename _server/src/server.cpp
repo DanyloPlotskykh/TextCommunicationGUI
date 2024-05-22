@@ -19,6 +19,9 @@ Server::Server() : m_port(7300),
 Server::~Server()
 {
     sockets.clear();
+    stop_timer = true;
+    cv.notify_one();
+    m_timerThread.join();
 }
 
 void Server::timerSlot(const int port)
@@ -135,7 +138,7 @@ void Server::sendToClient(const QString str)
     out << quint16(0) << str;
     out.device()->seek(0);
     out << quint16(Data.size()-sizeof(quint16));
-    addMessage(str);
+    
     for(int i = 0; i < sockets.size(); i++){
         sockets[i]->write(Data);
     }
@@ -147,6 +150,17 @@ void Server::sendToClient(const QString str)
         m_port = pair.second;
         Start();
     }
+    else if(pair.first == "//delete-")
+    {
+        deleteMessage(pair.second);
+        emit deleteQmlMessage(pair.second);  
+    }
+    else
+    {
+        m_listMessages.append(str);
+        addMessage(str);
+    }
+    
 }
 
 QPair<QString, int> Server::parser(QString message)
@@ -199,4 +213,14 @@ void Server::onChangePortClick(const QString& message)
     {
         emit incorrectPort();
     }
+}
+
+void Server::onDeleteBtnClick(const int id)
+{
+    sendToClient(QString("//delete-") + QString::number(id));
+}
+
+void Server::deleteMessage(const int id)
+{
+    m_listMessages.removeAt(id);
 }

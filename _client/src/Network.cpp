@@ -69,8 +69,6 @@ void Network::slotReadyRead()
             in >> str;
             nextBlockSize = 0;
             qDebug() << "received - " << str;
-            // int port;
-            addMessage(str);
             auto pair = parser(str);
             if(pair.first == "newport-" && pair.second > 1024 && pair.second < 65535)
             {
@@ -78,6 +76,15 @@ void Network::slotReadyRead()
                 disconnectFromServer();
                 m_port = pair.second;
                 connectToServer();
+            }
+            else if(pair.first == "//delete-")
+            {
+                deleteMessage(pair.second);
+            }
+            else
+            {
+                addMessage(str);
+                m_listMessages.append(str);
             }
             break;
         }
@@ -143,4 +150,15 @@ void Network::onChangePortClick(const QString& message)
     {
         emit incorrectPort();
     }
+}
+
+void Network::onDeleteBtnClick(const int id)
+{
+    sendMessage(QString("//delete-") + QString::number(id));
+}
+
+void Network::deleteMessage(const int id)
+{
+    m_listMessages.removeAt(id);
+    emit deleteQmlMessage(id);
 }
