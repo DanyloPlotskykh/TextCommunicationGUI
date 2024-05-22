@@ -8,7 +8,7 @@ ApplicationWindow {
     width: 400
     height: 600
     title: "Server"
-
+    color: "#151324"
     Server {
         id: server
     }
@@ -44,6 +44,13 @@ ApplicationWindow {
             Button {
                 id: startButton
                 text: "Start Server"
+                background: Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#554991"
+                    radius: 5
+                    border.color: "#000000"
+                }
                 onClicked: server.startServer()
                 Layout.fillWidth: true
             }
@@ -56,18 +63,24 @@ ApplicationWindow {
             Button {
                 id: changePortButton
                 text: "Change Port"
+                background: Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#554991"
+                    radius: 5
+                    border.color: "#000000"
+                }
                 onClicked: {
                     changePortDialog.open();
                 }
                 Layout.fillWidth: true
             }
-        }
+        }// Задание цвета фона
 
         ListView {
             id: chatListView
             Layout.fillWidth: true
             Layout.fillHeight: true
-
             model: chatModel
             delegate: RowLayout {
                 width: parent.width
@@ -77,12 +90,17 @@ ApplicationWindow {
                     text: model.message
                     wrapMode: Text.Wrap
                     font.pixelSize: 14
-                    color: "black"
+                    color: "#ffffff"
                     padding: 10
                 }
 
                 Button {
                     text: "Delete"
+                    background: Rectangle {
+                        color: "#554991"
+                        radius: 5
+                        border.color: "#000000"
+                    }
                     onClicked: {
                         server.onDeleteBtnClick(index)
                     }
@@ -99,7 +117,12 @@ ApplicationWindow {
             TextField {
                 id: messageInput
                 Layout.fillWidth: true
+                color: "#ffffff"
                 placeholderText: qsTr("Enter message here...")
+                background: Rectangle {
+                    color: "#3c384f" // Цвет фона
+                    radius: 4
+                }
                 onEditingFinished: 
                 {
                     if (messageInput.text !== "") {
@@ -110,7 +133,13 @@ ApplicationWindow {
             }
 
             Button {
-                text: qsTr("Send")
+                text: qsTr("Send Message")
+                background: Rectangle {
+                    height: 100
+                    color: "#554991"
+                    radius: 5
+                    border.color: "#000000"
+                }
                 onClicked: {
                     if (messageInput.text !== "") {
                         server.onSubmitClk(messageInput.text)
