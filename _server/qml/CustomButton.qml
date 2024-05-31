@@ -1,6 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+
+// Fix allignment
 Rectangle {
             id: startButton
             width: parent.width / 2
@@ -23,7 +25,7 @@ Rectangle {
             }
 
             Text {
-                text: "Нажми меня"
+                text: "Нажми меня" // What is that?
                 anchors.centerIn: parent
                 font.pixelSize: 20
                 color: "white"

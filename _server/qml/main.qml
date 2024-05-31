@@ -16,7 +16,7 @@ ApplicationWindow {
     Connections {
         target: server
         function onNewMessage(message) {
-            chatModel.append({"message": message})
+            chatModel.append({"message": message}) // model should be implemented in C++
         }
         function onConnectionStatusChanged() {
             correctDialog.open()
@@ -125,7 +125,7 @@ ApplicationWindow {
                 }
                 onEditingFinished: 
                 {
-                    if (messageInput.text !== "") {
+                    if (messageInput.text !== "") { // !empty()
                         server.onSubmitClk(messageInput.text)
                         messageInput.text = ""
                     }
@@ -141,7 +141,7 @@ ApplicationWindow {
                     border.color: "#000000"
                 }
                 onClicked: {
-                    if (messageInput.text !== "") {
+                    if (messageInput.text !== "") { // copy paste
                         server.onSubmitClk(messageInput.text)
                         messageInput.text = ""
                     }

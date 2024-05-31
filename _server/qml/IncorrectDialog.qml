@@ -14,7 +14,7 @@ Dialog {
         inCorrectDialog.y = (parent.height - inCorrectDialog.height) / 2;
     }
 
-    contentItem: Column {
+    contentItem: Column { // why it is column?
         Label {
             id: inclabeldialog
             text: "Change port failed!"

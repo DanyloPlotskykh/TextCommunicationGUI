@@ -50,7 +50,7 @@ Dialog {
                 onClicked: {
                     var message = portfield.text;
                     server.onChangePortClick(message)
-                    portfield.text = ""
+                    portfield.text = "" // clear
                     dialog.close()
                 }
             }

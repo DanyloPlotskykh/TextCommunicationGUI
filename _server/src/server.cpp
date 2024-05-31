@@ -5,6 +5,7 @@
 #include <random>
 #include <QPair>
 
+// universal reference may be used
 template <typename T1, typename T2>
 QPair<T1, T2> make_pair(const T1& first, const T2& second) {
     return QPair<T1, T2>(first, second);
@@ -13,14 +14,14 @@ QPair<T1, T2> make_pair(const T1& first, const T2& second) {
 Server::Server() : m_port(7300),
                    stop_timer(false)
 {
-    connect(this, &Server::onTimer, this, &Server::timerSlot);
+    connect(this, &Server::onTimer, this, &Server::timerSlot); // disconnect in dtor
 }
 
 Server::~Server()
 {
     sockets.clear();
     stop_timer = true;
-    cv.notify_one();
+    cv.notify_one(); // Now you have only one thread, but in the future may be more. Use notify_all in dtor
     m_timerThread.join();
 }
 
@@ -29,7 +30,7 @@ void Server::timerSlot(const int port)
     sendToClient("newport-" + QString::number(port));
 }
 
-int generate_random_port() {
+int generate_random_port() { // static
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(1024, 65535);
@@ -38,7 +39,7 @@ int generate_random_port() {
 
 void Server::timer()
 {
-    std::unique_lock<std::mutex> lk(cv_m);
+    std::unique_lock<std::mutex> lk(cv_m); // Use Qtimer
     while (true) {
         if (cv.wait_for(lk, std::chrono::seconds(45), [this]{ return stop_timer.load(); })) {
             qDebug() << "Timer stopped!";
@@ -89,8 +90,8 @@ void Server::incomingConnection(qintptr socketDescriptor)
 {
     socket = new QTcpSocket();
     socket->setSocketDescriptor(socketDescriptor);
-    connect(socket, &QTcpSocket::readyRead, this, &Server::slotRead);
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
+    connect(socket, &QTcpSocket::readyRead, this, &Server::slotRead); // onReadyRead
+    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater); // on delete you won't remove it from vector
 
     sockets.push_back(socket);
     qDebug() << "New client connected!" << socketDescriptor;
@@ -117,7 +118,7 @@ void Server::slotRead() {
                 break;
             }
             QString str;
-            in >> str;
+            in >> str; // You read all bytes instead of nextBlockSize
             nextBlockSize = 0;
             qDebug() << "received - " << str;
             int port;
@@ -126,6 +127,13 @@ void Server::slotRead() {
         }
     }
 }
+
+// std::variant<std::monotonic, ChangePort, DeleteMsg, Message>
+
+// handleMessage(ChangePort)
+// handleMessage(DeleteMsg)
+// handleMessage(Message)
+// std::visit(var, handleMessage);
 
 void Server::sendToClient(const QString str)
 {
@@ -136,25 +144,27 @@ void Server::sendToClient(const QString str)
     out.device()->seek(0);
     out << quint16(Data.size()-sizeof(quint16));
     
-    for(int i = 0; i < sockets.size(); i++){
+    for(int i = 0; i < sockets.size(); i++){ // for (auto & socket : sockets)
         sockets[i]->write(Data);
     }
-    auto pair = parser(str);
+    // DeleteMessage/NewPort/Message
+    // return type of message (ChangePort, DelereMsg, Message)
+    auto var = parser(str); // I don't know what is pair.first and second
     qDebug() << "Debug: " << pair.first << " " << pair.second;
     if(pair.first == "newport-" && pair.second > 1024 && pair.second < 65535)
     {
-        Stop();
+        Stop();// changePort()
         m_port = pair.second;
         Start();
     }
     else if(pair.first == "//delete-")
     {
         deleteMessage(pair.second);
-        emit deleteQmlMessage(pair.second);  
+        emit deleteQmlMessage(pair.second);  //move inside deleteMessage()
     }
     else
     {
-        if(sockets.size() > 0)
+        if(sockets.size() > 0) // !empty()
         {
             m_listMessages.append(str);
         }
@@ -165,6 +175,7 @@ void Server::sendToClient(const QString str)
 
 QPair<QString, int> Server::parser(QString message)
 {
+    // Overall algorithm can be improved
     QString strNumber;
     message.remove(' ');
     message = message.toLower();
@@ -174,7 +185,7 @@ QPair<QString, int> Server::parser(QString message)
         }
     }
     message.remove(QRegExp("\\d"));
-    return make_pair(message, strNumber.toInt());
+    return make_pair(message, strNumber.toInt()); // Can you use {message, strNumber.toInt()}?
 }
 
 void Server::onSubmitClk(const QString message)
@@ -189,6 +200,7 @@ void Server::addMessage(const QString& message)
 }
 
 bool isAllDigits(const QString &str) {
+    // alternative std::all_of(str.begin(), str.end(), std::is_digit);
     QRegularExpression re("^\\d+$");
     return re.match(str).hasMatch();
 }
@@ -203,13 +215,14 @@ void Server::onChangePortClick(const QString& message)
         {
             sendToClient(QString("newport-") + QString::number(intPort));
             emit connectionStatusChanged();
+            return;
         }
-        else
-        {
-            emit incorrectPort();
-        }
+        // else
+        // {
+        //     emit incorrectPort();
+        // }
     }
-    else
+    // else
     {
         emit incorrectPort();
     }
@@ -222,5 +235,5 @@ void Server::onDeleteBtnClick(const int id)
 
 void Server::deleteMessage(const int id)
 {
-    m_listMessages.removeAt(id);
+    m_listMessages.removeAt(id); // removeAt throws Exceptions
 }

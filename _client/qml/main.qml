@@ -89,10 +89,10 @@ ApplicationWindow {
                     Button {
                         text: qsTr("Delete")
                         background: Rectangle {
-                        color: "#554991"
-                        radius: 5
-                        border.color: "#000000"
-                    }
+                            color: "#554991"
+                            radius: 5
+                            border.color: "#000000"
+                        }
                         onClicked: {
                             backend.onDeleteBtnClick(index)
                         }

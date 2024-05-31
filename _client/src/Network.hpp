@@ -19,14 +19,14 @@ signals:
     void deleteQmlMessage(const int id);
 
 public slots:
-    void onButtonClick();
+    void onButtonClick(); // onConnectToServer
     void onSubmitBtnClick(QString message);
     void slotReadyRead();
     void onChangePortClick(const QString& message);
     void onDeleteBtnClick(const int id);
 
 private:
-    QTcpSocket *clientSocket;
+    QTcpSocket *clientSocket; // server
     QByteArray Data;
     int m_port;
     quint16 nextBlockSize;
@@ -35,7 +35,7 @@ private:
 private:
     void connectToServer();
     void disconnectFromServer();
-    void sendMessage(QString message);
+    void sendMessage(QString message); // const &
     QPair<QString, int> parser(QString message);
     void addMessage(const QString &message);
     void deleteMessage(const int id);
